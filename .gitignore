@@ -1,0 +1,27 @@
+# Python environments and caches
+.venv/
+.venv-*/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter and local editor files
+.ipynb_checkpoints/
+.vscode/
+
+# Generated research artifacts
+*.pkl
+*.joblib
+*.model
+*.csv.gz
+*.parquet
+outputs/
+artifacts/
+
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log

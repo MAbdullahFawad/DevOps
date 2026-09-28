@@ -2,9 +2,10 @@ import asyncio, json, traceback, sys
 from pathlib import Path
 import nbformat
 from nbclient import NotebookClient
-path=Path('TON_IoT_Research_Benchmark.ipynb')
+project_dir = Path(__file__).resolve().parent
+path = project_dir / 'TON_IoT_Research_Benchmark.ipynb'
 nb=nbformat.read(path,as_version=4)
-client=NotebookClient(nb,timeout=3600,kernel_name='ton_iot_research',resources={'metadata':{'path':str(Path.cwd())}},allow_errors=False)
+client=NotebookClient(nb,timeout=3600,kernel_name='ton_iot_research',resources={'metadata':{'path':str(project_dir)}},allow_errors=False)
 async def main():
     await client.async_setup_kernel()
     try:

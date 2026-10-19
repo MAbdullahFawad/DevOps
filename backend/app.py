@@ -7,9 +7,6 @@ backend/models/. The static GitHub Pages build never runs Python inference.
 from pathlib import Path
 import logging
 
-import joblib
-import numpy as np
-import pandas as pd
 from flask import Flask, jsonify, request
 
 BASE = Path(__file__).resolve().parent
@@ -23,6 +20,7 @@ def load_bundle():
     if not MODEL_PATH.exists():
         return None
     # Only load artifacts you created and trust. Pickle/joblib can execute code.
+    import joblib
     return joblib.load(MODEL_PATH)
 
 
@@ -52,6 +50,8 @@ def schema():
 
 
 def engineer(frame):
+    import numpy as np
+    import pandas as pd
     frame = frame.copy()
     for left, right, name in (("src_bytes", "dst_bytes", "byte"),
                               ("src_pkts", "dst_pkts", "packet")):
@@ -82,6 +82,8 @@ def predict():
     if BUNDLE is None:
         return jsonify(error="Local model is not available",
                        detail="Generate the trusted artifact from the research notebook and save it under backend/models/ton_iot_best_model.pkl."), 503
+    import numpy as np
+    import pandas as pd
     target = BUNDLE.get("target_name", "type")
     forbidden = {target, "label"}.intersection(record)
     if forbidden:

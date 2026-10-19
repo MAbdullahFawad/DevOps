@@ -26,7 +26,8 @@ Create and activate a virtual environment, then install the notebook dependencie
 python -m venv .venv-research
 .\.venv-research\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install jupyter nbformat nbclient pandas numpy scikit-learn matplotlib seaborn shap joblib datasets lightgbm xgboost catboost
+python -m pip install jupyter nbformat nbclient ipykernel pandas numpy scikit-learn matplotlib seaborn shap joblib datasets lightgbm xgboost catboost
+python -m ipykernel install --user --name ton_iot_research --display-name "Python (TON-IoT Research)"
 python run_notebook.py
 ```
 
@@ -50,7 +51,7 @@ npm.cmd ci
 npm.cmd start
 ```
 
-Open `http://localhost:4200`. Angular proxies `/api` to Flask at `127.0.0.1:5000`. The interface supports a network-flow record and keeps inputs local. The backend follows the bundle structure emitted by the notebook, including its label encoder, feature engineering, and CatBoost categorical handling.
+Open `http://localhost:4200`. Angular proxies `/api` to Flask at `127.0.0.1:5000`. The interface supports a network-flow record and keeps inputs local. The backend follows the bundle structure emitted by the notebook, including its label encoder, feature engineering, and CatBoost categorical handling. After the model is ready, the form loads its complete required input schema from `/schema`; fill every required field using values from one flow record. The ?Load example flow? button only fills a small illustrative starting point and does not supply a benchmark prediction.
 
 API endpoints:
 
@@ -58,7 +59,7 @@ API endpoints:
 - `GET /schema` describes the loaded model’s feature names and classes.
 - `POST /predict` accepts one JSON flow record and returns the predicted attack type and class probabilities.
 
-Install `backend/requirements-models.txt` in the same environment if you intend to load a model family that depends on LightGBM, XGBoost, or CatBoost. Without the model bundle, `/health` remains available, while `/schema` and `/predict` return HTTP 503 with setup guidance. The UI disables inference in this state.
+Install `backend/requirements-models.txt` in the same environment if you intend to load a model family that depends on LightGBM, XGBoost, or CatBoost. Without the model bundle, `/health` remains available, while `/schema` and `/predict` return HTTP 503 with setup guidance. The UI disables inference in this state. Confirm the services are connected with `Invoke-RestMethod http://127.0.0.1:4200/api/health`; it should return `status: ok`. Before training completes, `model_ready: false` and a prediction request intentionally returns 503. After training, restart Flask and confirm `model_ready: true`; then use the form at `http://localhost:4200`, open ?Complete model feature set,? enter all required flow values, and submit. Never add `label` or `type` to the record.
 
 ## Checks
 

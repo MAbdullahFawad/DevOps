@@ -33,6 +33,8 @@ python run_notebook.py
 
 Notebook execution downloads the dataset and runs multiple model comparisons. It may take substantial time and compute. On completion, the notebook saves the local API bundle to `backend/models/ton_iot_best_model.pkl`. Model artifacts and data are ignored by Git by default.
 
+The final notebook stage also writes one target-free benchmark record to `backend/test_payload.json` and `data/sample_inputs.csv` for reproducible verification. Keep Flask running in its own terminal, restart it after training so it loads the new bundle, then run `python -m backend.verify_local` from the repository root. This checks the required feature schema and compares the HTTP prediction and probabilities to the same-process Flask reference.
+
 ## Start the local full-stack app
 
 In Terminal 1, from the repository root:
@@ -59,7 +61,7 @@ API endpoints:
 - `GET /schema` describes the loaded model’s feature names and classes.
 - `POST /predict` accepts one JSON flow record and returns the predicted attack type and class probabilities.
 
-Install `backend/requirements-models.txt` in the same environment if you intend to load a model family that depends on LightGBM, XGBoost, or CatBoost. Without the model bundle, `/health` remains available, while `/schema` and `/predict` return HTTP 503 with setup guidance. The UI disables inference in this state. Confirm the services are connected with `Invoke-RestMethod http://127.0.0.1:4200/api/health`; it should return `status: ok`. Before training completes, `model_ready: false` and a prediction request intentionally returns 503. After training, restart Flask and confirm `model_ready: true`; then use the form at `http://localhost:4200`, open ?Complete model feature set,? enter all required flow values, and submit. Never add `label` or `type` to the record.
+Install `backend/requirements-models.txt` in the same environment if you intend to load a model family that depends on LightGBM, XGBoost, or CatBoost. Without the model bundle, `/health` remains available, while `/schema` and `/predict` return HTTP 503 with setup guidance. The UI disables inference in this state. Confirm the services are connected with `Invoke-RestMethod http://127.0.0.1:4200/api/health`; it should return `status: ok`. Before training completes, `model_ready: false` and a prediction request intentionally returns 503. After training, restart Flask and confirm `model_ready: true`; then run `python -m backend.verify_local` and use the form at `http://localhost:4200`, entering the values from `backend/test_payload.json` (including ?Complete model feature set?), then submit. Never add `label` or `type` to the record.
 
 ## Checks
 

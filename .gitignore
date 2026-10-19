@@ -12,7 +12,8 @@ frontend/.angular/
 .ipynb_checkpoints/
 *.log
 # Trained artifacts and private records are local unless explicitly approved.
-backend/models/*.joblib
-backend/models/*.pkl
+*.joblib
+*.pkl
+backend/test_payload.json
 data/*.csv
 !data_dictionary.csv

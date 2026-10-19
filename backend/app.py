@@ -21,7 +21,14 @@ def load_bundle():
         return None
     # Only load artifacts you created and trust. Pickle/joblib can execute code.
     import joblib
-    return joblib.load(MODEL_PATH)
+    bundle = joblib.load(MODEL_PATH)
+    required = {"model", "feature_columns", "raw_input_columns", "class_names", "target_name"}
+    missing = required.difference(bundle) if isinstance(bundle, dict) else required
+    if missing:
+        raise ValueError(f"Model bundle is incomplete or outdated: {', '.join(sorted(missing))}")
+    if not bundle["feature_columns"] or not bundle["raw_input_columns"]:
+        raise ValueError("Model bundle has an empty feature schema")
+    return bundle
 
 
 try:

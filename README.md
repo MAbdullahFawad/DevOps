@@ -77,13 +77,15 @@ CI runs the backend API checks and production Angular build on pushes and pull r
 
 ## Publish a code change
 
-The Angular dev server refreshes local UI edits while it is running. To publish a change, commit and push it to `main`:
+The Angular dev server refreshes local UI edits while it is running. In VS Code, publish a change using the Sync Changes control shown beside `main` in the status bar:
 
-```powershell
-git add .
-git commit -m "Describe the change"
-git push origin main
-```
+1. Save the edited file.
+2. Open **Source Control** with `Ctrl+Shift+G` and review the changed files.
+3. Select **+** beside a file to stage it (or stage all reviewed files).
+4. Enter a commit message and select **Commit**.
+5. Select **Sync Changes** in Source Control or the rotating arrows beside `main` in the status bar. Sync pulls first, then pushes your commit to GitHub.
+
+You can use the terminal instead: `git add <file>`, `git commit -m "Describe the change"`, then `git push origin main`.
 
 GitHub Actions then checks the backend and builds the frontend. A successful run deploys the frontend to Pages; a failed check stops deployment. Pull requests run CI checks but are not published until merged to `main`. Backend and model changes still run locally; GitHub Pages hosts only the static Angular frontend.
 

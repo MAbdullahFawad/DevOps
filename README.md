@@ -75,6 +75,18 @@ npm.cmd run build
 
 CI runs the backend API checks and production Angular build on pushes and pull requests to `main`. On a push to `main`, the GitHub Pages deployment runs only after both CI jobs pass. It intentionally does not train/download the research dataset or load a private model. Build output is uploaded as an Actions artifact.
 
+## Publish a code change
+
+The Angular dev server refreshes local UI edits while it is running. To publish a change, commit and push it to `main`:
+
+```powershell
+git add .
+git commit -m "Describe the change"
+git push origin main
+```
+
+GitHub Actions then checks the backend and builds the frontend. A successful run deploys the frontend to Pages; a failed check stops deployment. Pull requests run CI checks but are not published until merged to `main`. Backend and model changes still run locally; GitHub Pages hosts only the static Angular frontend.
+
 ## GitHub Pages
 
 `.github/workflows/ci.yml` builds the Angular app with the `/DevOps/` project-site base path and deploys the static files to GitHub Pages after CI succeeds. In repository Settings → Pages, set the source to **GitHub Actions**. The Pages site does not host Flask, the model, or inference. Its model state will be unavailable by design; local predictions require the local Flask server and the trusted model artifact.

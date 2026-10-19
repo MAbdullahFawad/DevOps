@@ -1,0 +1,13 @@
+Student: Muhammad Abdullah
+Registration ID: 232052
+GitHub repository: https://github.com/MAbdullahFawad/DevOps
+Workspace checked: 2026-10-19
+
+Detected on the authoring machine:
+Git: available (version not captured)
+Node.js: v26.3.0
+npm: PowerShell's npm.ps1 is blocked by execution policy; use npm.cmd
+Python: 3.14.5
+
+CI pins Python 3.12 and Node.js 24 for reproducible supported builds.
+Model bundle: not present in the cloned repository; local inference stays unavailable until the research notebook produces a trusted artifact.

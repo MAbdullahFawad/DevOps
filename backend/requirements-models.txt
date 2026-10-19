@@ -1,0 +1,5 @@
+# Install the estimator libraries used by the research notebook before loading
+# a fitted model bundle. A saved bundle requires the library it was trained with.
+lightgbm>=4.5,<5
+xgboost>=2.1,<4
+catboost>=1.2,<2

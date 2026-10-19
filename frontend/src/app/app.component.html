@@ -1,0 +1,50 @@
+<div class="app-shell">
+  <aside class="rail">
+    <a class="brand" href="#top" aria-label="Signal home"><span class="brand-mark"><i></i><i></i><i></i></span><span>signal<span class="brand-dot">.</span></span></a>
+    <div class="rail-label">WORKSPACE</div>
+    <a class="rail-link active" href="#overview"><span class="nav-glyph grid-glyph"></span>Overview</a>
+    <a class="rail-link" href="#analyze"><span class="nav-glyph pulse-glyph">⌁</span>Flow analysis</a>
+    <a class="rail-link" href="#about"><span class="nav-glyph ring-glyph">◌</span>Research notes</a>
+    <div class="rail-bottom"><span class="avatar">MA</span><span><b>Muhammad Abdullah</b><small>Research workspace</small></span><span class="more">···</span></div>
+  </aside>
+  <main id="top" class="main-content">
+    <header class="topbar"><div class="crumb">Workspace <span>/</span> <b>Overview</b></div><div class="top-right"><span class="mono">TON-IoT · BENCHMARK</span><span class="top-divider"></span><span class="profile">MA</span></div></header>
+    <section class="page" id="overview">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> NETWORK INTELLIGENCE <span class="eyebrow-line"></span> RESEARCH CONSOLE</div>
+      <div class="hero-heading"><div><h1>Make sense of<br><em>the unseen.</em></h1><p class="lede">A closer look at the signals moving through connected systems.</p></div><div class="hero-aside"><span class="live-orb"></span><span>{{ staticSite ? 'STATIC GITHUB PAGES PREVIEW' : 'LOCAL RESEARCH ENVIRONMENT' }}<br><b>{{ ready ? 'MODEL ONLINE' : checking ? 'CHECKING MODEL' : staticSite ? 'LOCAL API REQUIRED' : 'MODEL NOT INSTALLED' }}</b></span></div></div>
+      <div class="dashboard-grid">
+        <section class="card signal-card"><div class="card-top"><div><div class="card-kicker">01 / FLOW CLASSIFICATION</div><h2>Inspect a network flow</h2><p class="card-sub">Explore a single connection against the TON-IoT attack taxonomy.</p></div><span class="icon-chip">↗</span></div>
+          <div class="notice" *ngIf="!ready"><span class="notice-icon">i</span><span><b>{{ staticSite ? 'This is a static preview.' : 'Your local model is not installed yet.' }}</b><small>{{ staticSite ? 'GitHub Pages hosts the interface only. Run the local API and model to predict.' : 'Run the research notebook to create the trusted bundle. No predictions are fabricated.' }}</small></span><a href="#setup">Setup ↗</a></div>
+          <form id="analyze" (ngSubmit)="submit()">
+            <div class="form-section"><div class="section-title"><span>01</span> FLOW VOLUME <i></i></div><div class="fields three">
+              <label>Duration <small>seconds</small><input type="number" min="0" step="any" name="duration" [(ngModel)]="flow.duration" placeholder="0.042"></label>
+              <label>Source bytes<input type="number" min="0" name="src_bytes" [(ngModel)]="flow.src_bytes" placeholder="1,024"></label>
+              <label>Destination bytes<input type="number" min="0" name="dst_bytes" [(ngModel)]="flow.dst_bytes" placeholder="2,048"></label>
+              <label>Source packets<input type="number" min="0" name="src_pkts" [(ngModel)]="flow.src_pkts" placeholder="12"></label>
+              <label>Destination packets<input type="number" min="0" name="dst_pkts" [(ngModel)]="flow.dst_pkts" placeholder="18"></label>
+              <label>Connection state<select name="conn_state" [(ngModel)]="flow.conn_state"><option>SF</option><option>REJ</option><option>OTH</option><option>S0</option><option>RSTO</option></select></label>
+            </div></div>
+            <div class="form-section"><div class="section-title"><span>02</span> PROTOCOL CONTEXT <i></i></div><div class="fields three">
+              <label>Protocol<select name="proto" [(ngModel)]="flow.proto"><option>tcp</option><option>udp</option><option>icmp</option></select></label>
+              <label>Service<select name="service" [(ngModel)]="flow.service"><option>-</option><option>http</option><option>dns</option><option>ssl</option><option>ssh</option><option>dhcp</option></select></label>
+              <label>Source port<input type="number" min="0" max="65535" name="src_port" [(ngModel)]="flow.src_port" placeholder="49152"></label>
+              <label>Destination port<input type="number" min="0" max="65535" name="dst_port" [(ngModel)]="flow.dst_port" placeholder="443"></label>
+              <label>DNS query type<input type="number" min="0" name="dns_qtype" [(ngModel)]="flow.dns_qtype" placeholder="0"></label>
+              <label>HTTP status<input type="number" min="0" name="http_status_code" [(ngModel)]="flow.http_status_code" placeholder="0"></label>
+            </div></div>
+            <div class="form-actions"><span class="privacy"><span>⌑</span> Input stays on this device</span><button type="submit" [disabled]="!ready || busy">{{busy ? 'Analyzing flow…' : 'Analyze flow'}} <span>↗</span></button></div>
+          </form>
+          <div class="error" *ngIf="error">{{error}}</div>
+          <div class="result" *ngIf="result"><div><span class="card-kicker">PREDICTED ATTACK TYPE</span><h3>{{result.predicted_attack_type}}</h3><p>{{result.disclaimer}}</p></div><div class="confidence"><b>{{confidence}}<small>%</small></b><span>MODEL CONFIDENCE</span></div></div>
+        </section>
+        <aside class="side-column">
+          <section class="card taxonomy"><div class="card-kicker">02 / TAXONOMY</div><h2>Ten ways<br>to read a threat.</h2><p>Multiclass attribution across the traffic patterns represented in the benchmark.</p><div class="class-list"><div><span class="class-bullet coral"></span>Backdoor <small>01</small></div><div><span class="class-bullet blue"></span>DoS <small>02</small></div><div><span class="class-bullet gold"></span>DDoS <small>03</small></div><div><span class="class-bullet mint"></span>Injection <small>04</small></div><div><span class="class-bullet lilac"></span>Normal <small>05</small></div><div>+ 5 additional classes</div></div><div class="taxonomy-foot">BINARY DETECTION <span>Also evaluated ↗</span></div></section>
+          <section class="card signal-note" id="about"><div class="note-shape"><span></span><span></span><span></span><span></span><span></span></div><div class="card-kicker">A NOTE ON THE SIGNAL</div><p>Research is a starting point for better questions, never the final word.</p><a href="https://huggingface.co/datasets/codymlewis/TON_IoT_network" target="_blank" rel="noreferrer">Explore the dataset <span>↗</span></a></section>
+        </aside>
+      </div>
+      <section class="metrics-strip"><div><span class="metric-label">DATASET</span><b>TON-IoT</b><small>Network flow records</small></div><div><span class="metric-label">TASKS</span><b>02</b><small>Binary + multiclass</small></div><div><span class="metric-label">MODEL FAMILIES</span><b>05</b><small>Compared in research</small></div><div><span class="metric-label">IDENTITY HYGIENE</span><b><span class="check">✓</span> Applied</b><small>Endpoint fields excluded</small></div></section>
+      <section class="setup-row" id="setup"><div><div class="card-kicker">GETTING STARTED</div><h2>Bring your model to life.</h2><p>Run the benchmark notebook, then launch the local API and this interface.</p></div><div class="setup-steps"><code><span>01</span> python run_notebook.py</code><code><span>02</span> python backend/app.py</code><code><span>03</span> npm start <i>in frontend/</i></code></div></section>
+      <footer><span>© 2026 SIGNAL RESEARCH CONSOLE</span><span>BUILT FOR EXPLORATION · NOT PRODUCTION DECISIONS</span><a href="https://github.com/MAbdullahFawad/DevOps" target="_blank" rel="noreferrer">SOURCE ↗</a></footer>
+    </section>
+  </main>
+</div>

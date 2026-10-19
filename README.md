@@ -73,11 +73,11 @@ npm.cmd ci
 npm.cmd run build
 ```
 
-CI runs the backend API checks and production Angular build on pushes and pull requests to `main`. It intentionally does not train/download the research dataset or load a private model. Build output is uploaded as an Actions artifact.
+CI runs the backend API checks and production Angular build on pushes and pull requests to `main`. On a push to `main`, the GitHub Pages deployment runs only after both CI jobs pass. It intentionally does not train/download the research dataset or load a private model. Build output is uploaded as an Actions artifact.
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` builds the Angular app with the `/DevOps/` project-site base path and deploys the static files. In repository Settings → Pages, set the source to **GitHub Actions**. The Pages site does not host Flask, the model, or inference. Its model state will be unavailable by design; local predictions require the local Flask server and the trusted model artifact.
+`.github/workflows/ci.yml` builds the Angular app with the `/DevOps/` project-site base path and deploys the static files to GitHub Pages after CI succeeds. In repository Settings → Pages, set the source to **GitHub Actions**. The Pages site does not host Flask, the model, or inference. Its model state will be unavailable by design; local predictions require the local Flask server and the trusted model artifact.
 
 ## Project layout
 

@@ -45,6 +45,11 @@ def schema():
         return jsonify(error="Model bundle is not installed",
                        setup="Run TON_IoT_Research_Benchmark.ipynb and place its trusted output at backend/models/ton_iot_best_model.pkl"), 503
     return jsonify(features=BUNDLE["feature_columns"],
+                   numeric_features=BUNDLE.get("numeric_columns", []),
+                   categorical_features=BUNDLE.get("categorical_columns", []),
+                   required_inputs=BUNDLE.get("raw_input_columns", []),
+                   numeric_inputs=BUNDLE.get("raw_numeric_columns", []),
+                   categorical_inputs=BUNDLE.get("raw_categorical_columns", []),
                    model_name=BUNDLE.get("model_name"),
                    classes=BUNDLE.get("class_names", []))
 
@@ -53,6 +58,7 @@ def engineer(frame):
     import numpy as np
     import pandas as pd
     frame = frame.copy()
+    columns = set(frame.columns)
     for left, right, name in (("src_bytes", "dst_bytes", "byte"),
                               ("src_pkts", "dst_pkts", "packet")):
         if left in frame and right in frame:
@@ -60,17 +66,21 @@ def engineer(frame):
             b = pd.to_numeric(frame[right], errors="coerce").replace(0, np.nan)
             frame[f"{name}_ratio"] = a / b
             frame[f"{name}_imbalance"] = a - pd.to_numeric(frame[right], errors="coerce")
-    for source, name in (("duration", "bytes_per_second"),):
-        if source in frame and "src_bytes" in frame and "dst_bytes" in frame:
-            total = pd.to_numeric(frame.src_bytes, errors="coerce") + pd.to_numeric(frame.dst_bytes, errors="coerce")
-            frame[name] = total / pd.to_numeric(frame[source], errors="coerce").replace(0, np.nan)
-    if "duration" in frame and "src_pkts" in frame and "dst_pkts" in frame:
-        total = pd.to_numeric(frame.src_pkts, errors="coerce") + pd.to_numeric(frame.dst_pkts, errors="coerce")
-        frame["packets_per_second"] = total / pd.to_numeric(frame.duration, errors="coerce").replace(0, np.nan)
-    if "src_bytes" in frame and "dst_bytes" in frame and "src_pkts" in frame and "dst_pkts" in frame:
-        total_bytes = pd.to_numeric(frame.src_bytes, errors="coerce") + pd.to_numeric(frame.dst_bytes, errors="coerce")
-        total_packets = (pd.to_numeric(frame.src_pkts, errors="coerce") + pd.to_numeric(frame.dst_pkts, errors="coerce")).replace(0, np.nan)
-        frame["bytes_per_packet"] = total_bytes / total_packets
+    duration = next((c for c in ("duration", "flow_duration", "dur") if c in columns), None)
+    byte_count = next((c for c in ("bytes", "total_bytes", "sbytes") if c in columns), None)
+    packet_count = next((c for c in ("packets", "total_packets", "spkts") if c in columns), None)
+    if byte_count is None and {"src_bytes", "dst_bytes"}.issubset(columns):
+        byte_count = "__total_bytes"
+        frame[byte_count] = pd.to_numeric(frame.src_bytes, errors="coerce") + pd.to_numeric(frame.dst_bytes, errors="coerce")
+    if packet_count is None and {"src_pkts", "dst_pkts"}.issubset(columns):
+        packet_count = "__total_packets"
+        frame[packet_count] = pd.to_numeric(frame.src_pkts, errors="coerce") + pd.to_numeric(frame.dst_pkts, errors="coerce")
+    if duration and byte_count:
+        frame["bytes_per_second"] = pd.to_numeric(frame[byte_count], errors="coerce") / pd.to_numeric(frame[duration], errors="coerce").replace(0, np.nan)
+    if duration and packet_count:
+        frame["packets_per_second"] = pd.to_numeric(frame[packet_count], errors="coerce") / pd.to_numeric(frame[duration], errors="coerce").replace(0, np.nan)
+    if byte_count and packet_count:
+        frame["bytes_per_packet"] = pd.to_numeric(frame[byte_count], errors="coerce") / pd.to_numeric(frame[packet_count], errors="coerce").replace(0, np.nan)
     return frame.replace([np.inf, -np.inf], np.nan)
 
 
@@ -90,6 +100,9 @@ def predict():
         return jsonify(error="Target fields must not be supplied as predictors", fields=sorted(forbidden)), 400
     try:
         frame = engineer(pd.DataFrame([record]))
+        missing = [column for column in BUNDLE.get("raw_input_columns", []) if column not in frame]
+        if missing:
+            return jsonify(error="Incomplete flow record", detail="Supply every model input field.", missing_fields=missing), 400
         for column in BUNDLE["feature_columns"]:
             if column not in frame:
                 frame[column] = np.nan
